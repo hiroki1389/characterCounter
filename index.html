@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字数カウント</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px 20px; /* ボタン内の余白 */
+            border: none; /* ボーダーを消す */
+            border-radius: 5px; /* 角を丸く */
+            cursor: pointer; /* カーソルをポインターに */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* 背景色の変化と動き */
+            margin: 10px; /* ボタン同士の間隔 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* ボタンの影 */
+        }
+
+        button.green {
+            background-color: #4CAF50; /* 緑色 */
+            color: white; /* 文字色を白に */
+        }
+
+        button.green:hover {
+            background-color: #45a049; /* ホバー時に背景色が変わる */
+            transform: translateY(-2px); /* 上に少し浮かせる */
+        }
+
+        button.green:active {
+            transform: translateY(1px); /* クリック時にボタンが少し沈む */
+        }
+
+        button.blue {
+            background-color: #007BFF; /* 青色 */
+            color: white; /* 文字色を白に */
+        }
+
+        button.blue:hover {
+            background-color: #0056b3; /* ホバー時に背景色が変わる */
+            transform: translateY(-2px); /* 上に少し浮かせる */
+        }
+
+        button.blue:active {
+            transform: translateY(1px); /* クリック時にボタンが少し沈む */
+        }
+
+        button:focus {
+            outline: none; /* フォーカス時の枠線を消す */
+        }
+        textarea {
+            width: calc(100% - 20px);
+            height: 200px;
+            font-size: 16px;
+            padding: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+        .result p {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result p span.count-box {
+            width: 80px; /* 数字の枠を統一するための固定幅 */
+            text-align: center;
+            margin: 0 10px; /* 左右の余白を均等に */
+        }
+
+        .count-box {
+            display: inline-block;
+            width: 60px;
+            text-align: center;
+            border: 1px solid #000;
+            padding: 2px 5px;
+            margin: 0 5px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .label-left {
+            flex: 1;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .label-right {
+            flex: 1;
+            text-align: left;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">文字数カウント</h1>
+        <button class="green" onclick="convertToJapanese()">「、」「。」に統一</button>
+        <button class="green" onclick="convertToCommaPeriod()">“，”　“．”に統一</button>
+        <button class="blue" onclick="convertToFullWidth()">全角に変換</button>
+        <button class="blue" onclick="convertToHalfWidth()">半角英数字に統一</button>
+        <textarea id="textInput" oninput="countCharacters()" placeholder="ここにテキストを入力..."></textarea>
+        <div class="result">
+            <p><span class="label-left">選択中の文字数</span><span class="count-box" id="selectedCharCount">0</span><span class="label-right">文字</span></p>
+            <p></p>
+            <p><span class="label-left">文字数</span><span class="count-box" id="charCount">0</span><span class="label-right">文字</span></p>
+            <p><span class="label-left">改行を除いた文字数</span><span class="count-box" id="charCountNoNewline">0</span><span class="label-right">文字</span></p>
+            <p><span class="label-left">改行、空白を除いた文字数</span><span class="count-box" id="charCountNoSpace">0</span><span class="label-right">文字</span></p>
+            <p><span class="label-left">行数</span><span class="count-box" id="lineCount">0</span><span class="label-right">行</span></p>
+        </div>
+    </div>
+    <script>
+        // 文字数カウント
+        function countCharacters() {
+            let text = document.getElementById("textInput").value;
+            document.getElementById("charCount").textContent = text.length;
+            document.getElementById("charCountNoNewline").textContent = text.replace(/\n/g, "").length;
+            document.getElementById("charCountNoSpace").textContent = text.replace(/[\n\s]/g, "").length;
+            document.getElementById("lineCount").textContent = (text.match(/\n/g) || []).length + 1;
+        }
+
+        // 選択中の文字数カウント
+        document.addEventListener("selectionchange", () => {
+            let textarea = document.getElementById("textInput");
+            let selectedCount = 0;
+
+            if (document.activeElement === textarea) {
+                let start = textarea.selectionStart;
+                let end = textarea.selectionEnd;
+                selectedCount = end - start;
+            }
+
+            document.getElementById("selectedCharCount").textContent = selectedCount;
+        });
+
+        // カンマ「，」とピリオド「．」に変換
+        function convertToCommaPeriod() {
+            let textarea = document.getElementById("textInput");
+            let text = textarea.value;
+            text = text.replace(/、/g, "，").replace(/。/g, "．");
+            textarea.value = text;
+            countCharacters(); // 文字数カウントを更新
+        }
+
+        // 点「、」と丸「。」に変換
+        function convertToJapanese() {
+            let textarea = document.getElementById("textInput");
+            let text = textarea.value;
+            text = text.replace(/，/g , "、").replace(/．/g , "。");
+            textarea.value = text;
+            countCharacters(); // 文字数カウントを更新
+        }
+
+        // 半角を全角に変換
+        function convertToFullWidth() {
+            let textarea = document.getElementById("textInput");
+            let text = textarea.value;
+            text = text.replace(/[A-Za-z0-9]/g, function(s) {
+                return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+            }).replace(/\s/g, "　"); // 半角スペースを全角スペースに変換
+            textarea.value = text;
+            countCharacters(); // 文字数カウントを更新
+        }
+
+        // 半角英数字に変換
+        function convertToHalfWidth() {
+            let textarea = document.getElementById("textInput");
+            let text = textarea.value;
+            text = text.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(match) {
+                return String.fromCharCode(match.charCodeAt(0) - 0xFEE0); // 全角→半角
+            });
+            textarea.value = text;
+            countCharacters(); // 文字数カウントを更新
+        }
+    </script>
+</body>
+</html>
